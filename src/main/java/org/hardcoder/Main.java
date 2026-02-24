@@ -48,8 +48,8 @@ public class Main {
         frame.setJMenuBar(menuBar);
         attachMenuListeners();
 
-        // Crear área de trabajo
-        workArea = new WorkArea();
+        // Crear área de trabajo (pasando controlador y modelo)
+        workArea = new WorkArea(editorController, docModel);
         frame.getContentPane().add(workArea, BorderLayout.CENTER);
 
         // Confirmación de salida

@@ -13,6 +13,8 @@ public class WorkArea extends JPanel {
     private CardLayout cardLayout;
     private JTextArea editorArea;
     private JPanel imagePanel;
+    private EditorController editorController;
+    private DocumentModel docModel;
 
     // Identificadores de tarjetas
     public static final String CARD_NUEVO = "NUEVO";
@@ -22,7 +24,10 @@ public class WorkArea extends JPanel {
     public static final String CARD_SOBRE = "SOBRE";
     public static final String CARD_IMAGE = "IMAGE";
 
-    public WorkArea() {
+    public WorkArea(EditorController editorController, DocumentModel docModel) {
+        this.editorController = editorController;
+        this.docModel = docModel;
+
         cardLayout = new CardLayout();
         setLayout(cardLayout);
 
@@ -33,8 +38,8 @@ public class WorkArea extends JPanel {
 
         // Añadir tarjetas
         add(new NuevoPanel(editorArea), CARD_NUEVO);
-        add(new BuscarPanel(editorArea, null, null), CARD_BUSCAR);
-        add(new BuscarReemplazarPanel(editorArea, null, null), CARD_BUSCAR_REEMPLAZAR);
+        add(new BuscarPanel(editorArea, editorController, docModel), CARD_BUSCAR);
+        add(new BuscarReemplazarPanel(editorArea, editorController, docModel), CARD_BUSCAR_REEMPLAZAR);
         add(new ConfigPanel(editorArea), CARD_CONFIG);
         add(new SobrePanel(), CARD_SOBRE);
     }
@@ -45,6 +50,14 @@ public class WorkArea extends JPanel {
 
     public JTextArea getEditorArea() {
         return editorArea;
+    }
+
+    public EditorController getEditorController() {
+        return editorController;
+    }
+
+    public DocumentModel getDocModel() {
+        return docModel;
     }
 
     public void setImagePanel(BufferedImage img) {
