@@ -2,7 +2,7 @@ package org.hardcoder;
 
 import org.hardcoder.view.MenuBar;
 import org.hardcoder.view.WorkArea;
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -22,9 +22,9 @@ public class Main {
     private ImageController imageController;
 
     public static void main(String[] args) {
-        // Configurar FlatLaf Look and Feel (Windows 10 style)
+        // Configurar FlatLaf Look and Feel (Windows 10 Dark style)
         try {
-            UIManager.setLookAndFeel(new FlatLightLaf());
+            UIManager.setLookAndFeel(new FlatDarkLaf());
         } catch (UnsupportedLookAndFeelException ex) {
             System.err.println("Error al configurar FlatLaf: " + ex.getMessage());
         }
