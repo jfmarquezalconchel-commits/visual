@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class BuscarReemplazarPanel extends JPanel {
-    public BuscarReemplazarPanel(JTextArea editorArea) {
+    public BuscarReemplazarPanel(JTextArea editorArea, EditorController controller, DocumentModel model) {
         super(new BorderLayout());
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
         controls.add(new JLabel("Buscar:"));
@@ -18,7 +18,7 @@ public class BuscarReemplazarPanel extends JPanel {
         bFind.addActionListener(e -> {
             String term = tfBuscar.getText();
             int caret = editorArea.getCaretPosition();
-            int idx = editorArea.getText().indexOf(term, caret);
+            int idx = controller.find(term, caret);
             if (idx >= 0) {
                 editorArea.requestFocus();
                 editorArea.select(idx, idx + term.length());
@@ -30,26 +30,19 @@ public class BuscarReemplazarPanel extends JPanel {
         bReplace.addActionListener(e -> {
             String term = tfBuscar.getText();
             String replacement = tfReemplazar.getText();
-            int selStart = editorArea.getSelectionStart();
-            int selEnd = editorArea.getSelectionEnd();
-            if (selStart != selEnd && editorArea.getText().substring(selStart, selEnd).equals(term)) {
-                editorArea.replaceRange(replacement, selStart, selEnd);
+            boolean ok = controller.replace(term, replacement, false);
+            if (ok) {
+                editorArea.setText(model.getText());
             } else {
-                int caret = editorArea.getCaretPosition();
-                int idx = editorArea.getText().indexOf(term, caret);
-                if (idx >= 0) {
-                    editorArea.select(idx, idx + term.length());
-                    editorArea.replaceSelection(replacement);
-                } else {
-                    JOptionPane.showMessageDialog(this, "Término no encontrado para reemplazar.", "Reemplazar", JOptionPane.INFORMATION_MESSAGE);
-                }
+                JOptionPane.showMessageDialog(this, "Término no encontrado para reemplazar.", "Reemplazar", JOptionPane.INFORMATION_MESSAGE);
             }
         });
         JButton bReplaceAll = new JButton("Reemplazar todo");
         bReplaceAll.addActionListener(e -> {
             String term = tfBuscar.getText();
             String replacement = tfReemplazar.getText();
-            editorArea.setText(editorArea.getText().replace(term, replacement));
+            controller.replace(term, replacement, true);
+            editorArea.setText(model.getText());
             JOptionPane.showMessageDialog(this, "Reemplazo completo realizado.", "Reemplazar todo", JOptionPane.INFORMATION_MESSAGE);
         });
 
@@ -61,4 +54,3 @@ public class BuscarReemplazarPanel extends JPanel {
         add(new JScrollPane(editorArea), BorderLayout.CENTER);
     }
 }
-

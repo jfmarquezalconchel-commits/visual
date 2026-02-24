@@ -23,8 +23,13 @@ public class Main {
     private CardLayout cardLayout;
     // Área de edición común que usaremos para buscar/reemplazar y cargar/guardar
     private JTextArea editorArea;
+    // Modelo y controladores (ahora campos de instancia)
+    private DocumentModel docModel;
+    private EditorController editorController;
+    private ImageController imageController;
     // Panel usado para mostrar la imagen cargada (si existe)
     private JPanel imagePanel;
+
     public static void main(String[] args) {
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Este entorno es headless. No es posible mostrar la interfaz gráfica.");
@@ -51,10 +56,16 @@ public class Main {
         editorArea = new JTextArea();
         editorArea.setLineWrap(true);
         editorArea.setWrapStyleWord(true);
+
+        // Modelo y controladores (MVC)
+        docModel = new DocumentModel();
+        editorController = new EditorController(docModel);
+        imageController = new ImageController();
+
         // Tarjetas
         workArea.add(new NuevoPanel(editorArea), CARD_NUEVO);
-        workArea.add(new BuscarPanel(editorArea), CARD_BUSCAR);
-        workArea.add(new BuscarReemplazarPanel(editorArea), CARD_BUSCAR_REEMPLAZAR);
+        workArea.add(new BuscarPanel(editorArea, editorController, docModel), CARD_BUSCAR);
+        workArea.add(new BuscarReemplazarPanel(editorArea, editorController, docModel), CARD_BUSCAR_REEMPLAZAR);
         workArea.add(new ConfigPanel(editorArea), CARD_CONFIG);
         workArea.add(new SobrePanel(), CARD_SOBRE);
         // imagePanel se crea dinámicamente al cargar una imagen
@@ -126,11 +137,11 @@ public class Main {
                 String lc = p.toString().toLowerCase();
                 if (lc.endsWith(".jpg") || lc.endsWith(".jpeg") || lc.endsWith(".png") || lc.endsWith(".gif")) {
                     // Cargar imagen y mostrarla en la zona de trabajo
-                    BufferedImage img = ImageIO.read(p.toFile());
-                    if (img == null) {
-                        JOptionPane.showMessageDialog(frame, "No se pudo leer la imagen seleccionada.", "Error", JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
+                    BufferedImage img = imageController.loadImage(p);
+                     if (img == null) {
+                         JOptionPane.showMessageDialog(frame, "No se pudo leer la imagen seleccionada.", "Error", JOptionPane.ERROR_MESSAGE);
+                         return;
+                     }
                     // Si ya existe un panel de imagen anterior, lo removemos
                     if (imagePanel != null) {
                         workArea.remove(imagePanel);
@@ -143,8 +154,9 @@ public class Main {
                     showCard(CARD_IMAGE);
                 } else {
                     // Tratamiento por defecto: intentar leer como texto
-                    String content = Files.readString(p, StandardCharsets.UTF_8);
-                    editorArea.setText(content);
+                    // cargar a través del editorController para actualizar el modelo
+                    editorController.loadText(p);
+                    editorArea.setText(docModel.getText());
                     showCard(CARD_BUSCAR_REEMPLAZAR);
                     JOptionPane.showMessageDialog(frame, "Fichero cargado: " + p.toString(), "Cargar", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -166,7 +178,7 @@ public class Main {
                         return;
                     }
                 }
-                Files.writeString(p, editorArea.getText(), StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+                editorController.saveText(p, editorArea.getText());
                 JOptionPane.showMessageDialog(frame, "Fichero guardado: " + p.toString(), "Salvar", JOptionPane.INFORMATION_MESSAGE);
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(frame, "Error al guardar el fichero: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

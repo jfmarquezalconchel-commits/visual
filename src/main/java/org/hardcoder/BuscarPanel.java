@@ -4,18 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 
 public class BuscarPanel extends JPanel {
-    public BuscarPanel(JTextArea editorArea) {
+    public BuscarPanel(JTextArea editorArea, EditorController controller, DocumentModel model) {
         super(new BorderLayout());
         JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lbl = new JLabel("Término a buscar:");
         JTextField tf = new JTextField(20);
         JButton bFind = new JButton("Buscar siguiente");
         bFind.addActionListener(e -> {
-            // delegar búsqueda al Main (usaremos el editorArea caret)
             String term = tf.getText();
-            // buscar desde la posición actual
             int caret = editorArea.getCaretPosition();
-            int idx = editorArea.getText().indexOf(term, caret);
+            int idx = controller.find(term, caret);
             if (idx >= 0) {
                 editorArea.requestFocus();
                 editorArea.select(idx, idx + term.length());
@@ -30,4 +28,3 @@ public class BuscarPanel extends JPanel {
         add(new JScrollPane(editorArea), BorderLayout.CENTER);
     }
 }
-
