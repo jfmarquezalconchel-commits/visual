@@ -52,11 +52,11 @@ public class Main {
         editorArea.setLineWrap(true);
         editorArea.setWrapStyleWord(true);
         // Tarjetas
-        workArea.add(createNuevoPanel(), CARD_NUEVO);
-        workArea.add(createBuscarPanel(), CARD_BUSCAR);
-        workArea.add(createBuscarReemplazarPanel(), CARD_BUSCAR_REEMPLAZAR);
-        workArea.add(createConfigPanel(), CARD_CONFIG);
-        workArea.add(createSobrePanel(), CARD_SOBRE);
+        workArea.add(new NuevoPanel(editorArea), CARD_NUEVO);
+        workArea.add(new BuscarPanel(editorArea), CARD_BUSCAR);
+        workArea.add(new BuscarReemplazarPanel(editorArea), CARD_BUSCAR_REEMPLAZAR);
+        workArea.add(new ConfigPanel(editorArea), CARD_CONFIG);
+        workArea.add(new SobrePanel(), CARD_SOBRE);
         // imagePanel se crea dinámicamente al cargar una imagen
         // Confirmación de salida
         frame.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -108,75 +108,6 @@ public class Main {
         mb.add(Box.createHorizontalGlue()); // empuja el menú de ayuda a la derecha
         mb.add(mA);
         return mb;
-    }
-    private JPanel createNuevoPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        JLabel lbl = new JLabel("Espacio de trabajo - Nuevo documento", SwingConstants.CENTER);
-        lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 18f));
-        p.add(lbl, BorderLayout.NORTH);
-        JScrollPane sp = new JScrollPane(editorArea);
-        p.add(sp, BorderLayout.CENTER);
-        return p;
-    }
-    private JPanel createBuscarPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lbl = new JLabel("Término a buscar:");
-        JTextField tf = new JTextField(20);
-        JButton bFind = new JButton("Buscar siguiente");
-        bFind.addActionListener(e -> doFind(tf.getText(), false));
-        top.add(lbl);
-        top.add(tf);
-        top.add(bFind);
-        p.add(top, BorderLayout.NORTH);
-        p.add(new JScrollPane(editorArea), BorderLayout.CENTER);
-        return p;
-    }
-    private JPanel createBuscarReemplazarPanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        controls.add(new JLabel("Buscar:"));
-        JTextField tfBuscar = new JTextField(15);
-        controls.add(tfBuscar);
-        controls.add(new JLabel("Reemplazar:"));
-        JTextField tfReemplazar = new JTextField(15);
-        controls.add(tfReemplazar);
-        JButton bFind = new JButton("Buscar siguiente");
-        bFind.addActionListener(e -> doFind(tfBuscar.getText(), false));
-        JButton bReplace = new JButton("Reemplazar");
-        bReplace.addActionListener(e -> doReplace(tfBuscar.getText(), tfReemplazar.getText(), false));
-        JButton bReplaceAll = new JButton("Reemplazar todo");
-        bReplaceAll.addActionListener(e -> doReplace(tfBuscar.getText(), tfReemplazar.getText(), true));
-        controls.add(bFind);
-        controls.add(bReplace);
-        controls.add(bReplaceAll);
-        p.add(controls, BorderLayout.NORTH);
-        p.add(new JScrollPane(editorArea), BorderLayout.CENTER);
-        return p;
-    }
-    private JPanel createConfigPanel() {
-        JPanel p = new JPanel();
-        p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
-        p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JCheckBox cb1 = new JCheckBox("Activar modo ejemplo");
-        cb1.setSelected(true);
-        p.add(cb1);
-        p.add(Box.createVerticalStrut(10));
-        p.add(new JLabel("Tamaño de fuente de editor:"));
-        JSpinner sp = new JSpinner(new SpinnerNumberModel(14, 10, 36, 1));
-        sp.addChangeListener(e -> editorArea.setFont(editorArea.getFont().deriveFont(((Integer) sp.getValue()).floatValue())));
-        p.add(sp);
-        return p;
-    }
-    private JPanel createSobrePanel() {
-        JPanel p = new JPanel(new BorderLayout());
-        JTextArea ta = new JTextArea();
-        ta.setEditable(false);
-        ta.setText("Visual - Aplicación de ejemplo\n\nEsta aplicación demuestra una interfaz básica con Swing.\n\nAutores: Equipo de ejemplo\n2026");
-        ta.setLineWrap(true);
-        ta.setWrapStyleWord(true);
-        p.add(new JScrollPane(ta), BorderLayout.CENTER);
-        return p;
     }
     private void showCard(String name) {
         cardLayout.show(workArea, name);
@@ -302,39 +233,4 @@ public class Main {
                 "Sobre",
                 JOptionPane.INFORMATION_MESSAGE);
     }
-    // Panel interno para mostrar y escalar imágenes manteniendo la proporción
-    private static class ImagePanel extends JPanel {
-        private final BufferedImage image;
-        ImagePanel(BufferedImage image) {
-            this.image = image;
-            // para que el panel ocupe espacio inicial razonable
-            setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
-        }
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (image == null) return;
-            int w = getWidth();
-            int h = getHeight();
-            double imgW = image.getWidth();
-            double imgH = image.getHeight();
-            double scale = Math.min((double) w / imgW, (double) h / imgH);
-            int drawW = (int) Math.round(imgW * scale);
-            int drawH = (int) Math.round(imgH * scale);
-            int x = (w - drawW) / 2;
-            int y = (h - drawH) / 2;
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g2.drawImage(image, x, y, drawW, drawH, null);
-            g2.dispose();
-        }
-    }
 }
-
-/**
- *
- * test push with ia
- *
- */
-
