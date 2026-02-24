@@ -2,6 +2,7 @@ package org.hardcoder;
 
 import org.hardcoder.view.MenuBar;
 import org.hardcoder.view.WorkArea;
+import com.formdev.flatlaf.FlatLightLaf;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -21,6 +22,13 @@ public class Main {
     private ImageController imageController;
 
     public static void main(String[] args) {
+        // Configurar FlatLaf Look and Feel (Windows 10 style)
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (UnsupportedLookAndFeelException ex) {
+            System.err.println("Error al configurar FlatLaf: " + ex.getMessage());
+        }
+
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Este entorno es headless. No es posible mostrar la interfaz gráfica.");
             return;
